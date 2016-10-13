@@ -1,4 +1,5 @@
 var outputDiv;
+var tickerDiv;
 var player;
 var pieceTracker;
 var currentPiece;
@@ -10,7 +11,12 @@ var whitePlayerPieceCount;
 
 gameStart();
 
-outputMessage("This is chess");
+outputMessage("This is chess - White goes first...");
+
+function TESTBREAKPOINT(playerName){
+if(player == playerName)
+		debugger;	
+}
 
 function outputMessage(message) {
 
@@ -20,6 +26,7 @@ function outputMessage(message) {
 
 function gameStart() {
 		
+	tickerDiv = document.getElementById("chessticker");
 	outputDiv = document.getElementById("outputdiv");
 	pieceTracker = [];
 	
@@ -96,7 +103,8 @@ function gameStart() {
 	
 	player = "WhitePlayer";
 	
-	getPlayerPieceCounts();	
+	getPlayerPieceCounts();
+	OutputTickerInformation();
 		
 }
 
@@ -121,8 +129,7 @@ function clickSquare(xCoordinate, yCoordinate, squareToChange) {
 	}
 	
 	currentPieceIndex = getIndexOfPiece(squareOne.xCoordinate, squareOne.yCoordinate);
-	//alert(currentPieceIndex);
-	
+		
 	if(currentPieceIndex == -1)
 	{
 		outputMessage(" ");
@@ -132,60 +139,92 @@ function clickSquare(xCoordinate, yCoordinate, squareToChange) {
 		currentPiece = pieceTracker[currentPieceIndex];	
 	}
 	
-	//var message = "Unknown piece?! " + xCoordinate + "," + yCoordinate;
-	
 	identifyPiece();
-	
-	//outputMessage(message);
-	
+		
 	resetSquareVariables();
 	getPlayerPieceCounts();
+	OutputTickerInformation();
 	
+}
+
+function OutputTickerInformation() {
+	
+	var whiteCount = 0;
+	var blackCount = 0;
+	var pieceCount = pieceTracker.length;
+	
+	for(i = 0; i < pieceCount; i++)
+	{
+		if(pieceTracker[i].player == "WhitePlayer" && pieceTracker[i].pieceIsAlive)
+			whiteCount++;
+		
+		if(pieceTracker[i].player == "BlackPlayer" && pieceTracker[i].pieceIsAlive)
+			blackCount++;
+	}
+	
+	tickerDiv.innerHTML = "There are " + pieceCount + " pieces left on the board:<BR>";
+	tickerDiv.innerHTML += "WhitePlayer: " + whiteCount + "<BR>";
+	tickerDiv.innerHTML += "BlackPlayer: " + blackCount + "<BR>";
 }
 
 function identifyPiece() {
 	
-	if(currentPiece.isPawn)
+	if(currentPiece.player != player)
 	{
-		//message = "Pawn";
+		illegalMove();
+		return;
+	}
+	else if(currentPiece.isPawn)
+	{
 		checkPawnMove();
 	}
 	
 	else if(currentPiece.isRook)
 	{
-		//message = "Rook";
 		checkRookMove();
 	}
 	
 	else if(currentPiece.isKnight)
 	{
-		//message = "Knight";
 		checkKnightMove();
 	}
 	
 	else if(currentPiece.isBishop)
 	{
-		//message = "Bishop";
+		console.log("Bishop move not yet implemented...");
 	}
 	
 	else if(currentPiece.isKing)
 	{
-		//message = "King";
+		console.log("King move not yet implemented...");
 	}
 	
 	else if(currentPiece.isQueen)
 	{
-		//message = "Queen";
+		console.log("Queen move not yet implemented...");
 	}
 	
 }
 
 function checkKnightMove() {
-	
-	if((squareOne.xCoordinate + 1 == squareTwo.xCoordinate && squareOne.yCoordinate + 2 == squareTwo.yCoordinate)
+	if(
+	//1 to the right and up 2
+	(squareOne.xCoordinate + 1 == squareTwo.xCoordinate && squareOne.yCoordinate + 2 == squareTwo.yCoordinate)
+	//2 to the right and up 1
 	|| (squareOne.xCoordinate + 2 == squareTwo.xCoordinate && squareOne.yCoordinate + 1 == squareTwo.yCoordinate)
+	//1 to the left and up 2
 	|| (squareOne.xCoordinate - 1 == squareTwo.xCoordinate && squareOne.yCoordinate + 2 == squareTwo.yCoordinate)
-	|| (squareOne.xCoordinate - 2 == squareTwo.xCoordinate && squareOne.yCoordinate + 1 == squareTwo.yCoordinate))
+	//2 to the left and up 1
+	|| (squareOne.xCoordinate - 2 == squareTwo.xCoordinate && squareOne.yCoordinate + 1 == squareTwo.yCoordinate)
+	//1 to the left and down 2
+	|| (squareOne.xCoordinate - 1 == squareTwo.xCoordinate && squareOne.yCoordinate - 2 == squareTwo.yCoordinate)
+	//1 to the right and down 2
+	|| (squareOne.xCoordinate + 1 == squareTwo.xCoordinate && squareOne.yCoordinate - 2 == squareTwo.yCoordinate)
+	//1 down and 2 to the left
+	|| (squareOne.xCoordinate - 2 == squareTwo.xCoordinate && squareOne.yCoordinate - 1 == squareTwo.yCoordinate)
+	//1 down and 2 to the right
+	|| (squareOne.xCoordinate + 2 == squareTwo.xCoordinate && squareOne.yCoordinate - 1 == squareTwo.yCoordinate)
+	)
 	{
 		completeKnightMove();
 	}
@@ -345,7 +384,7 @@ function checkPawnMove() {
 
 	if(player == "WhitePlayer")
 	{	
-		if(!currentPiece.pawnHadFirstMove && (squareTwo.yCoordinate - squareOne.yCoordinate == 1))
+		if(!currentPiece.pawnHadFirstMove && (squareTwo.yCoordinate - squareOne.yCoordinate == 2))
 		{
 			completePawnMove(-2);
 			
@@ -362,9 +401,9 @@ function checkPawnMove() {
 		}
 	}
 	
-	else
-	{
-		if(!currentPiece.pawnHadFirstMove && (squareOne.yCoordinate - squareTwo.yCoordinate == 1))
+	else if (player == "BlackPlayer")
+	{		
+		if(!currentPiece.pawnHadFirstMove && (squareOne.yCoordinate - squareTwo.yCoordinate == 2))
 		{
 			completePawnMove(2);
 			currentPiece.pawnHadFirstMove = true;
@@ -375,18 +414,14 @@ function checkPawnMove() {
 			completePawnMove(1);
 		}
 	}
+	else
+	{
+		alert("Neither WhitePlayer nor BlackPlayer?!");
+	}
 
 }
 
-function completePawnMove(increment) {
-		
-		
-//Testing only
-if(player == "BlackPlayer")
-{
-debugger;
-}
-		
+function completePawnMove(increment) {		
 		if(getIndexOfPiece(squareTwo.xCoordinate, squareTwo.yCoordinate) > -1)
 		{
 			if(pieceTracker[getIndexOfPiece(squareTwo.xCoordinate, squareTwo.yCoordinate)].isKing)
@@ -560,8 +595,7 @@ function square(xCoordinate, yCoordinate, player, divName, image) {
   this.pieceIsBishop = false;
   this.pieceIsKnight = false;
   this.pieceIsKing = false;
-  this.pieceIsQueen = false;
-				
+  this.pieceIsQueen = false;			
 }
 
 function getPlayerPieceCounts() {
