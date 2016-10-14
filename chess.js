@@ -457,33 +457,70 @@ function checkBishopMove() {
 	//Right and up OR left and down
 	if(squareTwo.xCoordinate - squareOne.xCoordinate == squareTwo.yCoordinate - squareOne.yCoordinate)
 	{
-		var tempX;
-		var tempY;
-		var validMove = true;		
+		//Right and up
+		if(squareTwo.xCoordinate > squareOne.xCoordinate && squareTwo.yCoordinate > squareOne.yCoordinate)
+		{	
+			var tempX;
+			var tempY;
+			var validMove = true;		
 
-		tempX = squareTwo.xCoordinate - 1;
-		tempY = squareTwo.yCoordinate - 1;
-		
-		while(tempX > squareOne.xCoordinate && tempY > squareOne.yCoordinate)
-		{
-			if(getIndexOfPiece(tempX, tempY) > -1)
+			tempX = squareTwo.xCoordinate - 1;
+			tempY = squareTwo.yCoordinate - 1;
+			
+			while(tempX > squareOne.xCoordinate && tempY > squareOne.yCoordinate)
 			{
-				validMove = false;
-				break;
+				if(getIndexOfPiece(tempX, tempY) > -1)
+				{
+					validMove = false;
+					break;
+				}
+				
+				tempX--;
+				tempY--;
 			}
-			
-			tempX--;
-			tempY--;
+				
+			if(validMove)
+			{
+				completeBishopMove();
+			}
+			else
+			{
+				illegalMove();
+			}	
 		}
-			
-		if(validMove)
-		{
-			completeBishopMove();
-		}
+		//Down and left
 		else
 		{
-			illegalMove();
-		}		
+			var tempX;
+			var tempY;
+			var validMove = true;		
+
+			tempX = squareTwo.xCoordinate + 1;
+			tempY = squareTwo.yCoordinate + 1;
+			
+			while(tempX < squareOne.xCoordinate && tempY < squareOne.yCoordinate)
+			{
+				if(getIndexOfPiece(tempX, tempY) > -1)
+				{
+					validMove = false;
+					break;
+				}
+				
+				tempX++;
+				tempY++;
+			}
+				
+			if(validMove)
+			{
+				completeBishopMove();
+			}
+			else
+			{
+				illegalMove();
+			}
+			
+		}
+
 	}
 	// //Left and up OR right and down
 	else if(squareOne.xCoordinate - squareTwo.xCoordinate == squareTwo.yCoordinate - squareOne.yCoordinate)
