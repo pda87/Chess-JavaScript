@@ -8,15 +8,11 @@ var squareOne;
 var squareTwo;
 var blackPlayerPieceCount;
 var whitePlayerPieceCount;
+var isIllegalMove;
 
 gameStart();
 
 outputMessage("This is chess - White goes first...");
-
-function TESTBREAKPOINT(playerName){
-if(player == playerName)
-		debugger;	
-}
 
 function outputMessage(message) {
 
@@ -26,6 +22,7 @@ function outputMessage(message) {
 
 function gameStart() {
 		
+	isIllegalMove = false;
 	tickerDiv = document.getElementById("chessticker");
 	outputDiv = document.getElementById("outputdiv");
 	pieceTracker = [];
@@ -191,17 +188,17 @@ function identifyPiece() {
 	
 	else if(currentPiece.isBishop)
 	{
-		console.log("Bishop move not yet implemented...");
+		checkBishopMove();
 	}
 	
 	else if(currentPiece.isKing)
 	{
-		console.log("King move not yet implemented...");
+		checkKingMove();
 	}
 	
 	else if(currentPiece.isQueen)
 	{
-		console.log("Queen move not yet implemented...");
+		checkQueenMove();
 	}
 	
 }
@@ -273,7 +270,6 @@ function checkRookMove() {
 				tempX--;
 			}
 		}
-		
 		else
 		{
 			tempX = squareTwo.xCoordinate + 1;
@@ -301,11 +297,8 @@ function checkRookMove() {
 		}
 		
 	}
-	
 	else if(squareTwo.xCoordinate == squareOne.xCoordinate)
 	{
-		//completeMove();
-		
 		var tempX = squareTwo.xCoordinate;
 		var tempY;
 		var validMove = true;
@@ -326,7 +319,6 @@ function checkRookMove() {
 			}
 			 
 		}
-		
 		else
 		{
 			tempY = squareTwo.yCoordinate + 1;
@@ -345,20 +337,16 @@ function checkRookMove() {
 			
 		}
 		
-
-		
 		if(validMove)
 		{
 			completeRookMove();
 		}
-		
 		else
 		{
 			illegalMove();
 		}
 		
 	}
-	
 	else
 	{
 		illegalMove();
@@ -464,15 +452,154 @@ function completePawnMove(increment) {
 
 }
 
+function checkBishopMove() {
+	
+	//Right and up OR left and down
+	if(squareTwo.xCoordinate - squareOne.xCoordinate == squareTwo.yCoordinate - squareOne.yCoordinate)
+	{
+		var tempX;
+		var tempY;
+		var validMove = true;		
+
+		tempX = squareTwo.xCoordinate - 1;
+		tempY = squareTwo.yCoordinate - 1;
+		
+		while(tempX > squareOne.xCoordinate && tempY > squareOne.yCoordinate)
+		{
+			if(getIndexOfPiece(tempX, tempY) > -1)
+			{
+				validMove = false;
+				break;
+			}
+			
+			tempX--;
+			tempY--;
+		}
+			
+		if(validMove)
+		{
+			completeBishopMove();
+		}
+		else
+		{
+			illegalMove();
+		}		
+	}
+	// //Left and up OR right and down
+	else if(squareOne.xCoordinate - squareTwo.xCoordinate == squareTwo.yCoordinate - squareOne.yCoordinate)
+	{
+		//Left and up
+		if(squareTwo.xCoordinate < squareOne.xCoordinate)
+		{
+			var tempX;
+			var tempY;
+			var validMove = true;		
+
+			tempX = squareTwo.xCoordinate + 1;
+			tempY = squareTwo.yCoordinate - 1;
+			
+			while(tempX < squareOne.xCoordinate && tempY > squareOne.yCoordinate)
+			{
+				if(getIndexOfPiece(tempX, tempY) > -1)
+				{
+					validMove = false;
+					break;
+				}
+					tempX++;
+					tempY--;	
+			}
+				
+			if(validMove)
+			{
+				completeBishopMove();
+			}
+			else
+			{
+				illegalMove();
+			}	
+		}
+		//Right and down
+		else if(squareTwo.xCoordinate > squareOne.xCoordinate)
+		{
+			var tempX;
+			var tempY;
+			var validMove = true;		
+
+			tempX = squareTwo.xCoordinate - 1;
+			tempY = squareTwo.yCoordinate + 1;
+			
+			while(tempX > squareOne.xCoordinate && tempY < squareOne.yCoordinate)
+			{
+				if(getIndexOfPiece(tempX, tempY) > -1)
+				{
+					validMove = false;
+					break;
+				}
+					tempX--;
+					tempY++;	
+			}
+				
+			if(validMove)
+			{
+				completeBishopMove();
+			}
+			else
+			{
+				illegalMove();
+			}	
+		}
+		else
+		{
+			console.log("Unhandled Bishop move...");
+		}
+	}
+	else
+	{
+		illegalMove();
+	}	
+}
+
+function completeBishopMove(){
+	if(pieceTrackerContainsPiece(squareTwo.xCoordinate, squareTwo.yCoordinate))
+	{
+		completeTakingMove();
+	}
+	
+	else
+	{		
+		completeMove();
+	}
+}
+
+function checkQueenMove() {
+	
+	//Queen = Bishop + Rook
+	checkRookMove();
+	
+	if(isIllegalMove)
+	{
+		checkBishopMove();
+	}
+		
+}
+
+function checkKingMove() {
+	
+	//King is the same as Queen, but can only move 1 in each direction
+	if(squareTwo.xCoordinate - squareOne.xCoordinate > 1 || squareTwo.yCoordinate - squareOne.yCoordinate > 1
+	|| squareOne.xCoordinate - squareTwo.xCoordinate > 1 || squareOne.yCoordinate - squareTwo.yCoordinate > 1)
+	{
+		illegalMove();
+	}
+	else
+	{
+		checkQueenMove();
+	}
+}
+
 function completeMove() {
 	
 	var pieceIndex2 = getIndexOfPiece(squareTwo.xCoordinate, squareTwo.yCoordinate);
-		
-	// if(pieceTracker[pieceIndex2].player == player)
-	// {
-		// illegalMove();
-		// return;
-	// }
 	
 	currentPiece.xCoordinate = squareTwo.xCoordinate;
 	currentPiece.yCoordinate = squareTwo.yCoordinate;
@@ -569,7 +696,7 @@ function pieceTrackerContainsPiece(xCoordinate, yCoordinate) {
 }
 
 function illegalMove() {
-	
+	isIllegalMove = true;
 	outputMessage(player + " illegal move");
 
 }
@@ -579,7 +706,7 @@ function resetSquareVariables() {
 	squareOne = null;
 	squareTwo = null;
 	currentPiece = -1;
-	
+	isIllegalMove = false;
 }
 
 function square(xCoordinate, yCoordinate, player, divName, image) {
