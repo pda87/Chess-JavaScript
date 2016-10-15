@@ -9,6 +9,8 @@ var squareTwo;
 var blackPlayerPieceCount;
 var whitePlayerPieceCount;
 var isIllegalMove;
+var isForCheckingCheck;
+var isCheck;
 
 gameStart();
 
@@ -23,6 +25,8 @@ function outputMessage(message) {
 function gameStart() {
 		
 	isIllegalMove = false;
+	isForCheckingCheck = false;
+	isCheck = false;
 	tickerDiv = document.getElementById("chessticker");
 	outputDiv = document.getElementById("outputdiv");
 	pieceTracker = [];
@@ -137,11 +141,21 @@ function clickSquare(xCoordinate, yCoordinate, squareToChange) {
 	}
 	
 	identifyPiece();
+	
+	checkCheck();
 		
 	resetSquareVariables();
 	getPlayerPieceCounts();
 	OutputTickerInformation();
 	
+	if(isCheck)
+	{
+		//I needed a timeout here or otherwise the "I think we have a 'Check' situation" text was popping up BEFORE the
+		//complete move was shown
+		setTimeout(function(){
+			alert("I think we have a 'Check' situation?!");
+		}, 100);
+	}
 }
 
 function OutputTickerInformation() {
@@ -176,19 +190,16 @@ function displayPieceImage() {
 	{
 		player = "BlackPlayer";
 	}
-	
 	else if(player == "BlackPlayer")
 	{
 		player = "WhitePlayer";
 	}
-	
 	else
 	{
 		alert("displayPieceImage() - Unknown player?!");
 	}
 	
 	outputMessage("Successful move - " + player + " turn.");
-		
 }
 
 function getIndexOfPiece(xCoordinate, yCoordinate){
