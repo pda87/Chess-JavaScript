@@ -429,6 +429,57 @@ function completeMove() {
 		return;
 	}
 	
+	//Before you complete the move, you need to check if the current move is going to result in the current player's King being in Check
+	//This is an illegal move
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	//Kinda cheating, but this will never change
+	//White King index = 12
+	//Black King index = 28
+	
+	//Store the move information before simulating the move and either completing the move or resetting things if it is illegal
+	var currentPieceSquareOne = squareOne;
+	var currentPieceSquareTwo = squareTwo;
+	var currentPieceDivName = currentPiece.divName;
+	
+	//At this point, the move has already been verified as illegal, as in, according the movement of the piece, so it is fine to go ahead
+		
+	//So, set the second square of the current piece:
+	currentPiece.xCoordinate = squareTwo.xCoordinate;
+	currentPiece.yCoordinate = squareTwo.yCoordinate;
+	currentPiece.divName = squareTwo.divName;
+	
+	//Now check for Check:
+	
+	checkCheck();
+	
+	if(isCheck && checkedKing == player)
+	{
+		//Hoorah! This is an illegal move - you cannot move into Check
+		//Reset the piece information to back the way it was before the simulated move:
+		currentPiece.xCoordinate = currentPieceSquareOne.xCoordinate;
+		currentPiece.yCoordinate = currentPieceSquareOne.yCoordinate;
+		currentPiece.divName = currentPieceDivName;
+		//Do illegalMove() stuff:
+		illegalMove();
+		//return because this move will not be going ahead!
+		alert("You cannot move into Check!");
+		return;
+		//debugger;
+	}
+	
+	//Reset the piece information to back the way it was before the simulated move:
+	currentPiece.xCoordinate = currentPieceSquareOne.xCoordinate;
+	currentPiece.yCoordinate = currentPieceSquareOne.yCoordinate;
+	currentPiece.divName = currentPieceDivName;
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	if(pieceTrackerContainsPiece(squareTwo.xCoordinate, squareTwo.yCoordinate))
 	{
 		completeTakingMove();
@@ -480,9 +531,13 @@ function illegalMove() {
 
 function checkCheck() {
 	
-	if(currentPiece.isPawn)
+	checkedKing = "";
+
+
+	if(isCheck)
 	{
-		return;
+		//'isCheck' is sticking on, so even if it WAS in Check, if the next move gets it out of Check, it still thinks it is in Check
+		isCheck = false;
 	}
 	
 	isForCheckingCheck = true;
@@ -519,20 +574,23 @@ function checkCheck() {
 		{
 			continue;
 		}
-				
+		
 		//Populate the values of the 'squares' normally read in by clicking - these will be used to simulate moves and check for 'Check'
 		squareOne = new square(tempPiece.xCoordinate, tempPiece.yCoordinate, tempPiece.player);
 				
 		var opponentKingPiece;
+		var ownKingPiece;
 		
 		//Get the opponent's King Piece into opponentKingPiece
 		if(tempPiece.player == "WhitePlayer")
 		{
 			opponentKingPiece = pieceTracker[28];
+			ownKingPiece = pieceTracker[12];
 		}
 		else if(tempPiece.player == "BlackPlayer")
 		{
 			opponentKingPiece = pieceTracker[12];
+			ownKingPiece = pieceTracker[28];
 		}
 		else
 		{
@@ -556,8 +614,10 @@ function checkCheck() {
 		
 		if(isCheck)
 		{
+			checkedKing = opponentKingPiece.player;
 			break;
 		}
+		
 	}
 	//End of for loop
 	isForCheckingCheck = false;

@@ -11,6 +11,7 @@ var whitePlayerPieceCount;
 var isIllegalMove;
 var isForCheckingCheck;
 var isCheck;
+var checkedKing;
 
 gameStart();
 
@@ -139,7 +140,7 @@ function clickSquare(xCoordinate, yCoordinate, squareToChange) {
 	{
 		currentPiece = pieceTracker[currentPieceIndex];	
 	}
-	
+
 	identifyPiece();
 	
 	checkCheck();
