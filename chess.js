@@ -12,6 +12,7 @@ var isIllegalMove;
 var isForCheckingCheck;
 var isCheck;
 var checkedKing;
+var isCheckmate;
 
 gameStart();
 
@@ -28,6 +29,7 @@ function gameStart() {
 	isIllegalMove = false;
 	isForCheckingCheck = false;
 	isCheck = false;
+	isCheckmate = false;
 	tickerDiv = document.getElementById("chessticker");
 	outputDiv = document.getElementById("outputdiv");
 	pieceTracker = [];
@@ -156,6 +158,11 @@ function clickSquare(xCoordinate, yCoordinate, squareToChange) {
 		setTimeout(function(){
 			alert("I think we have a 'Check' situation?!");
 		}, 100);
+	}
+	
+	if(isCheck)
+	{
+	  checkCheckmate();
 	}
 }
 
