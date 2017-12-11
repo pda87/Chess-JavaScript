@@ -1,0 +1,29 @@
+body {
+    background-color: black;
+    text-align: center;
+    color: white;
+    margin-top: 5%;
+}
+
+.chess-square {
+    width:8%;
+    float:left;
+}
+
+.chess-square-green {
+    background-color:green;
+}
+
+.chess-square-white {
+    background-color:white;
+    color: black;
+}
+
+.chessimage {
+    width: 80%;
+    height: auto;
+}
+
+.chess-board {
+    padding-left: 25%;
+}
