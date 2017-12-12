@@ -1,14 +1,14 @@
 var chessFunctionsModule = {
 	checkCheck: function() {
-		checkedKing = "";
+		chessModule.$checkedKing = "";
 		
-		if(isCheck)
+		if(chessModule.$isCheck)
 		{
 			//'isCheck' is sticking on, so even if it WAS in Check, if the next move gets it out of Check, it still thinks it is in Check
-			isCheck = false;
+			chessModule.$isCheck = false;
 		}
 		
-		isForCheckingCheck = true;
+		chessModule.$isForCheckingCheck = true;
 		
 		// Ok, to check if the game is in a 'Check' state:
 		// - Check if every piece in the pieceTracker list is able to move to the King in one legal move
@@ -20,10 +20,10 @@ var chessFunctionsModule = {
 		//Black King index = 28
 		
 		//Store the original 'currentPiece' in a variable for use later
-		var originalCurrentPiece = currentPiece;
+		var originalCurrentPiece = chessModule.$currentPiece;
 		
 		//Start of for loop
-		for(i = 0; i < pieceTracker.length; i++)
+		for(i = 0; i < chessModule.$pieceTracker.length; i++)
 		{
 			if(i == 12 || i == 28)
 			{
@@ -31,11 +31,11 @@ var chessFunctionsModule = {
 			}
 			
 			//Store old 'square' information
-			var oldSquareOne = squareOne;
-			var oldSquareTwo = squareTwo;
+			var oldSquareOne = chessModule.$squareOne;
+			var oldSquareTwo = chessModule.$squareTwo;
 			
 			//THIS piece from 'i'
-			var tempPiece = pieceTracker[i];
+			var tempPiece = chessModule.$pieceTracker[i];
 			
 			//Pawns cannot check the King;
 			if(tempPiece.isPawn)
@@ -44,7 +44,7 @@ var chessFunctionsModule = {
 			}
 			
 			//Populate the values of the 'squares' normally read in by clicking - these will be used to simulate moves and check for 'Check'
-			squareOne = new chessFunctionsModule.square(tempPiece.xCoordinate, tempPiece.yCoordinate, tempPiece.player);
+			chessModule.$squareOne = new chessFunctionsModule.square(tempPiece.xCoordinate, tempPiece.yCoordinate, tempPiece.player);
 					
 			var opponentKingPiece;
 			var ownKingPiece;
@@ -52,13 +52,13 @@ var chessFunctionsModule = {
 			//Get the opponent's King Piece into opponentKingPiece
 			if(tempPiece.player == "WhitePlayer")
 			{
-				opponentKingPiece = pieceTracker[28];
-				ownKingPiece = pieceTracker[12];
+				opponentKingPiece = chessModule.$pieceTracker[28];
+				ownKingPiece = chessModule.$pieceTracker[12];
 			}
 			else if(tempPiece.player == "BlackPlayer")
 			{
-				opponentKingPiece = pieceTracker[12];
-				ownKingPiece = pieceTracker[28];
+				opponentKingPiece = chessModule.$pieceTracker[12];
+				ownKingPiece = chessModule.$pieceTracker[28];
 			}
 			else
 			{
@@ -66,28 +66,28 @@ var chessFunctionsModule = {
 			}
 			
 			//Set squareTwo to be the coordinates of the opponent's King
-			squareTwo = new chessFunctionsModule.square(opponentKingPiece.xCoordinate, opponentKingPiece.yCoordinate, tempPiece.player);
+			chessModule.$squareTwo = new chessFunctionsModule.square(opponentKingPiece.xCoordinate, opponentKingPiece.yCoordinate, tempPiece.player);
 			
 			//Now just need to check the move and if it is a legal move, the game is in 'Check'
-			currentPiece = tempPiece;
+			chessModule.$currentPiece = tempPiece;
 			
 			chessMovesModule.identifyPiece();
 			
 			//If identify piece came back and bool isCheck is now set, then your work here is done
 			//Reset everything and then break out of this loop		
-			currentPiece = originalCurrentPiece;
-			squareOne = oldSquareOne;
-			squareTwo = oldSquareTwo;
+			chessModule.$currentPiece = originalCurrentPiece;
+			chessModule.$squareOne = oldSquareOne;
+			chessModule.$squareTwo = oldSquareTwo;
 			
-			if(isCheck)
+			if(chessModule.$isCheck)
 			{
-				checkedKing = opponentKingPiece.player;
+				chessModule.$checkedKing = opponentKingPiece.player;
 				break;
 			}
 			
 		}
 		//End of for loop
-		isForCheckingCheck = false;		
+		chessModule.$isForCheckingCheck = false;		
 	},
 	checkCheckmate: function() {
 		//todo...

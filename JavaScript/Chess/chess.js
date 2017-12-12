@@ -1,17 +1,3 @@
-var player;
-var pieceTracker;
-var currentPiece;
-var currentPieceIndex;
-var squareOne;
-var squareTwo;
-var blackPlayerPieceCount;
-var whitePlayerPieceCount;
-var isIllegalMove;
-var isForCheckingCheck;
-var isCheck;
-var checkedKing;
-var isCheckmate;
-
 var chessModule  = {
 	init: function() {
 		this.cacheDOM();
@@ -37,21 +23,36 @@ var chessModule  = {
 	},
 	chessGameStart: function() {
 		//Setup
+		this.$blackPlayerPieceCount = 0;
+		this.$whitePlayerPieceCount = 0;
+		this.$isCheck = false;
+		this.$isCheckmate = false;
+
+		this.$isIllegalMove = false;
+		this.$isForCheckingCheck = false;
+
+		this.$currentPieceIndex = -1;
+
+		this.$checkedKing = "";
+		
+		//This tracks the coordinates, player and image of each piece
+		this.$pieceTracker = [];
+		
+		this.$currentPiece = "";
+
+		this.$squareOne = null
+		this.$squareTwo = null;
+
 		this.$imageFolder = "Images/ChessPieceImages/";
 		this.setSquareXYValues();
 		this.setImgIDs();
 		this.bindEvents();
-
-		isIllegalMove = false;
-		isForCheckingCheck = false;
-		isCheck = false;
-		isCheckmate = false;
 	
 		this.outputMessage("This is chess - White goes first...");
 	
 		this.setupStartPieces();
 		
-		player = "WhitePlayer";
+		this.$player = "WhitePlayer";
 		
 		this.getPlayerPieceCounts();
 		this.OutputTickerInformation();
@@ -95,76 +96,74 @@ var chessModule  = {
 		this.$chessSquares.on("click", chessModule.clickSquare);
 	},
 	setupStartPieces: function() {
-		pieceTracker = [];
-		
 		//Each player has 16 pieces at the start
 		//16 white:
 		//8 pawns:
-		pieceTracker.push(new chessFunctionsModule.square(0, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(1, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(2, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(3, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(4, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(5, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(6, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(7, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(0, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(1, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(2, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(3, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(4, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(5, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(6, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(7, 1, "WhitePlayer", this.$imageFolder + "P1Pawn.png"));
 		
 		for(i = 0; i < 8; i++)
 		{
-			pieceTracker[i].isPawn = true;
+			chessModule.$pieceTracker[i].isPawn = true;
 		}
 			
 		//White back row:
-		pieceTracker.push(new chessFunctionsModule.square(0, 0, "WhitePlayer", this.$imageFolder + "P1Rook.png"));
-		pieceTracker[8].isRook = true;
-		pieceTracker.push(new chessFunctionsModule.square(1, 0, "WhitePlayer", this.$imageFolder + "P1Bishop.png"));
-		pieceTracker[9].isBishop = true;
-		pieceTracker.push(new chessFunctionsModule.square(2, 0, "WhitePlayer", this.$imageFolder + "P1Knight.png"));
-		pieceTracker[10].isKnight = true;
-		pieceTracker.push(new chessFunctionsModule.square(3, 0, "WhitePlayer", this.$imageFolder + "P1Queen.png"));
-		pieceTracker[11].isQueen = true;
-		pieceTracker.push(new chessFunctionsModule.square(4, 0, "WhitePlayer", this.$imageFolder + "P1King.png"));
-		pieceTracker[12].isKing = true;
-		pieceTracker.push(new chessFunctionsModule.square(5, 0, "WhitePlayer", this.$imageFolder + "P1Knight.png"));
-		pieceTracker[13].isKnight = true;
-		pieceTracker.push(new chessFunctionsModule.square(6, 0, "WhitePlayer", this.$imageFolder + "P1Bishop.png"));
-		pieceTracker[14].isBishop = true;
-		pieceTracker.push(new chessFunctionsModule.square(7, 0, "WhitePlayer", this.$imageFolder + "P1Rook.png"));
-		pieceTracker[15].isRook = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(0, 0, "WhitePlayer", this.$imageFolder + "P1Rook.png"));
+		chessModule.$pieceTracker[8].isRook = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(1, 0, "WhitePlayer", this.$imageFolder + "P1Bishop.png"));
+		chessModule.$pieceTracker[9].isBishop = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(2, 0, "WhitePlayer", this.$imageFolder + "P1Knight.png"));
+		chessModule.$pieceTracker[10].isKnight = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(3, 0, "WhitePlayer", this.$imageFolder + "P1Queen.png"));
+		chessModule.$pieceTracker[11].isQueen = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(4, 0, "WhitePlayer", this.$imageFolder + "P1King.png"));
+		chessModule.$pieceTracker[12].isKing = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(5, 0, "WhitePlayer", this.$imageFolder + "P1Knight.png"));
+		chessModule.$pieceTracker[13].isKnight = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(6, 0, "WhitePlayer", this.$imageFolder + "P1Bishop.png"));
+		chessModule.$pieceTracker[14].isBishop = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(7, 0, "WhitePlayer", this.$imageFolder + "P1Rook.png"));
+		chessModule.$pieceTracker[15].isRook = true;
 		
 		//16 black
 		//8 pawns:
-		pieceTracker.push(new chessFunctionsModule.square(0, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(1, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(2, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(3, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(4, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(5, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(6, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
-		pieceTracker.push(new chessFunctionsModule.square(7, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(0, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(1, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(2, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(3, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(4, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(5, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(6, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(7, 6, "BlackPlayer", this.$imageFolder + "P2Pawn.png"));
 		
 		for(i = 16; i < 24; i++)
 		{
-			pieceTracker[i].isPawn = true;
+			chessModule.$pieceTracker[i].isPawn = true;
 		}
 		
 		//Black back row:
-		pieceTracker.push(new chessFunctionsModule.square(0, 7, "BlackPlayer", this.$imageFolder + "P2Rook.png"));
-		pieceTracker[24].isRook = true;
-		pieceTracker.push(new chessFunctionsModule.square(1, 7, "BlackPlayer", this.$imageFolder + "P2Bishop.png"));
-		pieceTracker[25].isBishop = true;
-		pieceTracker.push(new chessFunctionsModule.square(2, 7, "BlackPlayer", this.$imageFolder + "P2Knight.png"));
-		pieceTracker[26].isKnight = true;
-		pieceTracker.push(new chessFunctionsModule.square(3, 7, "BlackPlayer", this.$imageFolder + "P2Queen.png"));
-		pieceTracker[27].isQueen = true;
-		pieceTracker.push(new chessFunctionsModule.square(4, 7, "BlackPlayer", this.$imageFolder + "P2King.png"));
-		pieceTracker[28].isKing = true;
-		pieceTracker.push(new chessFunctionsModule.square(5, 7, "BlackPlayer", this.$imageFolder + "P2Knight.png"));
-		pieceTracker[29].isKnight = true;
-		pieceTracker.push(new chessFunctionsModule.square(6, 7, "BlackPlayer", this.$imageFolder + "P2Bishop.png"));
-		pieceTracker[30].isBishop = true;
-		pieceTracker.push(new chessFunctionsModule.square(7, 7, "BlackPlayer", this.$imageFolder + "P2Rook.png"));
-		pieceTracker[31].isRook = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(0, 7, "BlackPlayer", this.$imageFolder + "P2Rook.png"));
+		chessModule.$pieceTracker[24].isRook = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(1, 7, "BlackPlayer", this.$imageFolder + "P2Bishop.png"));
+		chessModule.$pieceTracker[25].isBishop = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(2, 7, "BlackPlayer", this.$imageFolder + "P2Knight.png"));
+		chessModule.$pieceTracker[26].isKnight = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(3, 7, "BlackPlayer", this.$imageFolder + "P2Queen.png"));
+		chessModule.$pieceTracker[27].isQueen = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(4, 7, "BlackPlayer", this.$imageFolder + "P2King.png"));
+		chessModule.$pieceTracker[28].isKing = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(5, 7, "BlackPlayer", this.$imageFolder + "P2Knight.png"));
+		chessModule.$pieceTracker[29].isKnight = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(6, 7, "BlackPlayer", this.$imageFolder + "P2Bishop.png"));
+		chessModule.$pieceTracker[30].isBishop = true;
+		chessModule.$pieceTracker.push(new chessFunctionsModule.square(7, 7, "BlackPlayer", this.$imageFolder + "P2Rook.png"));
+		chessModule.$pieceTracker[31].isRook = true;
 	},
 	setSquareAsClicked: function(square) {
 		square.css("background-color", "red");
@@ -197,35 +196,35 @@ var chessModule  = {
 		var yCoordinate = Number.parseInt(clickedSquare.parent().prop("id"));
 		var squareToChange = clickedSquare.find("img").prop("id");
 
-		if(squareOne == null)
+		if(chessModule.$squareOne == null)
 		{
-			squareOne = new chessFunctionsModule.square(xCoordinate, yCoordinate, player);
-			chessModule.outputMessage(player + " first square selected");
+			chessModule.$squareOne = new chessFunctionsModule.square(xCoordinate, yCoordinate, chessModule.$player);
+			chessModule.outputMessage(chessModule.$player + " first square selected");
 			chessModule.setSquareAsClicked(clickedSquare);
 			return;
 		}
 		
-		if(squareOne != null)
+		if(chessModule.$squareOne != null)
 		{
-			squareTwo = new chessFunctionsModule.square(xCoordinate, yCoordinate, player);
+			chessModule.$squareTwo = new chessFunctionsModule.square(xCoordinate, yCoordinate, chessModule.$player);
 			chessModule.setSquareAsClicked(clickedSquare);
 		}
 
-		if(squareOne.divName == squareTwo.divName)
+		if(chessModule.$squareOne.divName == chessModule.$squareTwo.divName)
 		{
 			chessMovesModule.illegalMove();
 			return;
 		}
 		
-		currentPieceIndex = chessModule.getIndexOfPiece(squareOne.xCoordinate, squareOne.yCoordinate);
+		chessModule.$currentPieceIndex = chessModule.getIndexOfPiece(chessModule.$squareOne.xCoordinate, chessModule.$squareOne.yCoordinate);
 			
-		if(currentPieceIndex == -1)
+		if(chessModule.$currentPieceIndex == -1)
 		{
 			chessModule.outputMessage(" ");
 		}
 		else
 		{
-			currentPiece = pieceTracker[currentPieceIndex];	
+			chessModule.$currentPiece = chessModule.$pieceTracker[chessModule.$currentPieceIndex];	
 		}
 
 		chessMovesModule.identifyPiece();
@@ -234,7 +233,7 @@ var chessModule  = {
 		chessModule.getPlayerPieceCounts();
 		chessModule.OutputTickerInformation();
 		
-		if(isCheck)
+		if(chessModule.$isCheck)
 		{
 			//I needed a timeout here or otherwise the "I think we have a 'Check' situation" text was popping up BEFORE the
 			//complete move was shown
@@ -243,7 +242,7 @@ var chessModule  = {
 			}, 100);
 		}
 		
-		if(isCheck)
+		if(chessModule.$isCheck)
 		{
 			chessFunctionsModule.checkCheckmate();
 		}
@@ -251,14 +250,14 @@ var chessModule  = {
 	OutputTickerInformation: function() {
 		var whiteCount = 0;
 		var blackCount = 0;
-		var pieceCount = pieceTracker.length;
+		var pieceCount = chessModule.$pieceTracker.length;
 		
 		for(i = 0; i < pieceCount; i++)
 		{
-			if(pieceTracker[i].player == "WhitePlayer" && pieceTracker[i].pieceIsAlive)
+			if(chessModule.$pieceTracker[i].player == "WhitePlayer" && chessModule.$pieceTracker[i].pieceIsAlive)
 				whiteCount++;
 			
-			if(pieceTracker[i].player == "BlackPlayer" && pieceTracker[i].pieceIsAlive)
+			if(chessModule.$pieceTracker[i].player == "BlackPlayer" && chessModule.$pieceTracker[i].pieceIsAlive)
 				blackCount++;
 		}
 	
@@ -267,38 +266,38 @@ var chessModule  = {
 		"BlackPlayer: " + blackCount + "<BR>");
 	},
 	displayPieceImage: function() {
-		var squareOneDiv = chessModule.$chess.find(squareOne.divName);
-		var squareTwoDiv = chessModule.$chess.find(squareTwo.divName);;
+		var squareOneDiv = chessModule.$chess.find(chessModule.$squareOne.divName);
+		var squareTwoDiv = chessModule.$chess.find(chessModule.$squareTwo.divName);
 
 		squareOneDiv.prop("src", "");
 		squareOneDiv.removeProp("src");
 		squareOneDiv.removeAttr("src");
-		squareTwoDiv.prop("src",currentPiece.image);
+		squareTwoDiv.prop("src",chessModule.$currentPiece.image);
 		
-		if(player == "WhitePlayer")
+		if(chessModule.$player == "WhitePlayer")
 		{
-			player = "BlackPlayer";
+			chessModule.$player = "BlackPlayer";
 		}
-		else if(player == "BlackPlayer")
+		else if(chessModule.$player == "BlackPlayer")
 		{
-			player = "WhitePlayer";
+			chessModule.$player = "WhitePlayer";
 		}
 		else
 		{
 			alert("displayPieceImage() - Unknown player?!");
 		}
 		
-		this.outputMessage("Successful move - " + player + " turn.");
+		this.outputMessage("Successful move - " + chessModule.$player + " turn.");
 	},
 	getIndexOfPiece: function(xCoordinate, yCoordinate){
 		
 		var pieceIndex = -1;
 			
-		for(var i = 0; i < pieceTracker.length; i++)
+		for(var i = 0; i < chessModule.$pieceTracker.length; i++)
 		{
-			if(pieceTracker[i].xCoordinate == xCoordinate
-			&& pieceTracker[i].yCoordinate == yCoordinate
-			&& pieceTracker[i].pieceIsAlive)
+			if(chessModule.$pieceTracker[i].xCoordinate == xCoordinate
+			&& chessModule.$pieceTracker[i].yCoordinate == yCoordinate
+			&& chessModule.$pieceTracker[i].pieceIsAlive)
 			{
 				pieceIndex = i;
 				break;
@@ -325,31 +324,31 @@ var chessModule  = {
 		
 	},
 	resetSquareVariables: function () {
-		chessModule.resetSquareColor(squareOne);
-		chessModule.resetSquareColor(squareTwo);
+		chessModule.resetSquareColor(chessModule.$squareOne);
+		chessModule.resetSquareColor(chessModule.$squareTwo);
 
-		squareOne = null;
-		squareTwo = null;
-		currentPiece = -1;
-		isIllegalMove = false;
+		chessModule.$squareOne = null;
+		chessModule.$squareTwo = null;
+		chessModule.$currentPiece = -1;
+		chessModule.$isIllegalMove = false;
 	},
 	getPlayerPieceCounts: function() {
 		
-		blackPlayerPieceCount = 0;
-		whitePlayerPieceCount = 0;
+		chessModule.$blackPlayerPieceCount = 0;
+		chessModule.$whitePlayerPieceCount = 0;
 			
-		for(i = 0; i < pieceTracker.length; i++)
+		for(i = 0; i < chessModule.$pieceTracker.length; i++)
 		{
-			if(pieceTracker[i].pieceIsAlive)
+			if(chessModule.$pieceTracker[i].pieceIsAlive)
 			{
-				if(pieceTracker[i].player == "BlackPlayer")
+				if(chessModule.$pieceTracker[i].player == "BlackPlayer")
 				{
-					blackPlayerPieceCount++;
+					chessModule.$blackPlayerPieceCount++;
 				}
 				
-				else if(pieceTracker[i].player == "WhitePlayer")
+				else if(chessModule.$pieceTracker[i].player == "WhitePlayer")
 				{
-					whitePlayerPieceCount++;
+					chessModule.$whitePlayerPieceCount++;
 				}
 				
 				else
