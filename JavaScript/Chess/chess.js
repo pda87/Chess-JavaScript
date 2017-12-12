@@ -271,6 +271,8 @@ var chessModule  = {
 		var squareTwoDiv = chessModule.$chess.find(squareTwo.divName);;
 
 		squareOneDiv.prop("src", "");
+		squareOneDiv.removeProp("src");
+		squareOneDiv.removeAttr("src");
 		squareTwoDiv.prop("src",currentPiece.image);
 		
 		if(player == "WhitePlayer")
